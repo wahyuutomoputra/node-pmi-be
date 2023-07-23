@@ -37,7 +37,7 @@ class Database {
       connection: {
         host: "localhost",
         user: "root",
-        password: "root",
+        password: "",
         database: "skripsi",
       },
     });
