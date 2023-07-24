@@ -17,5 +17,9 @@ export class AssetService {
     return await this.assetRepository.get();
   }
 
+  public async getPaginatedAssets(pageNumber: number){
+    return await this.assetRepository.getPaginatedAssets(pageNumber, 10)
+  }
+
   // Metode lainnya untuk logika bisnis terkait pengguna
 }

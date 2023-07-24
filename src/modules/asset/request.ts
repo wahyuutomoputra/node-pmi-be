@@ -54,4 +54,10 @@ import {
     @IsDate()
     tgl_masuk!: Date;
   }
+
+  export class paginateAssets {
+    @IsDefined()
+    @IsNotEmpty()
+    page!: number
+  }
   
