@@ -17,8 +17,17 @@ import BorrowerRoutes from "./routes/BorrowerRoutes";
 import AssetRoutes from "./routes/AssetRoutes";
 import AuthRoutes from "./routes/AuthRoutes";
 import { verifyToken } from "./middleware/AuthMiddleware";
+import { IEmployee } from "@modules/employee/types";
 
 const app = express();
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IEmployee;
+    }
+  }
+}
 
 // Initialize database connection
 const database = Database.getInstance();

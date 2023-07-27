@@ -30,6 +30,8 @@ export function verifyToken(
       responseCode({ res, code: 403, message: "Invalid token" });
       return;
     }
+
+    req.user = jwt.decode(token) as IEmployee;
     next();
   });
 }
