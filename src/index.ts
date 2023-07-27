@@ -36,11 +36,11 @@ app.use("/api/users", UserRoutes(knexInstance));
 app.use("/api/roles", RoleRoutes(knexInstance));
 app.use("/api/groups", GroupRoutes(knexInstance));
 app.use("/api/divisions", DivisionRoutes(knexInstance));
-app.use("/api/types", TypeRoutes(knexInstance));
+app.use("/api/types", verifyToken, TypeRoutes(knexInstance));
 app.use("/api/instances", InstanceRoutes(knexInstance));
 app.use("/api/employees", EmployeeRoutes(knexInstance));
 app.use("/api/borrowers", BorrowerRoutes(knexInstance));
-app.use("/api/assets", verifyToken, AssetRoutes(knexInstance));
+app.use("/api/assets", AssetRoutes(knexInstance));
 app.use("/api/auth", AuthRoutes(knexInstance));
 
 // Start the server
