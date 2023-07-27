@@ -17,7 +17,7 @@ import BorrowerRoutes from "./routes/BorrowerRoutes";
 import AssetRoutes from "./routes/AssetRoutes";
 import AuthRoutes from "./routes/AuthRoutes";
 import { verifyToken } from "./middleware/AuthMiddleware";
-import { IEmployee } from "@modules/employee/types";
+import { IEmployee } from "./modules/employee/types";
 
 const app = express();
 
