@@ -16,6 +16,7 @@ import EmployeeRoutes from "./routes/EmployeeRoutes";
 import BorrowerRoutes from "./routes/BorrowerRoutes";
 import AssetRoutes from "./routes/AssetRoutes";
 import AuthRoutes from "./routes/AuthRoutes";
+import { verifyToken } from "./middleware/AuthMiddleware";
 
 const app = express();
 
@@ -39,7 +40,7 @@ app.use("/api/types", TypeRoutes(knexInstance));
 app.use("/api/instances", InstanceRoutes(knexInstance));
 app.use("/api/employees", EmployeeRoutes(knexInstance));
 app.use("/api/borrowers", BorrowerRoutes(knexInstance));
-app.use("/api/assets", AssetRoutes(knexInstance));
+app.use("/api/assets", verifyToken, AssetRoutes(knexInstance));
 app.use("/api/auth", AuthRoutes(knexInstance));
 
 // Start the server
