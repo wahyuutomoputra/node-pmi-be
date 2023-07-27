@@ -7,9 +7,9 @@ export interface IEmployee {
   }
   
   export interface addEmployee {
-    nama?: string;
-    email?: string;
-    password?: string;
+    nama: string;
+    email: string;
+    password: string;
     id_divisi?: number;
   }
   
