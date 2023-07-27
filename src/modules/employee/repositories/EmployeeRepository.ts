@@ -18,5 +18,13 @@ export class EmployeeRepository {
     return await this.knex<IEmployee>(this.table);
   }
 
+  public async getByEmail(email: string): Promise<IEmployee> {
+    return await this.knex
+      .select()
+      .from(this.table)
+      .where("email", "=", email)
+      .first();
+  }
+
   // Metode lainnya untuk berinteraksi dengan entitas pengguna dalam database
 }

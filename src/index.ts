@@ -3,7 +3,7 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import morgan from 'morgan';
+import morgan from "morgan";
 import Database from "./database/Database";
 
 import UserRoutes from "./routes/UserRoutes";
@@ -15,6 +15,7 @@ import InstanceRoutes from "./routes/InstanceRoutes";
 import EmployeeRoutes from "./routes/EmployeeRoutes";
 import BorrowerRoutes from "./routes/BorrowerRoutes";
 import AssetRoutes from "./routes/AssetRoutes";
+import AuthRoutes from "./routes/AuthRoutes";
 
 const app = express();
 
@@ -27,7 +28,7 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(morgan('dev'))
+app.use(morgan("dev"));
 
 // Routes
 app.use("/api/users", UserRoutes(knexInstance));
@@ -39,6 +40,7 @@ app.use("/api/instances", InstanceRoutes(knexInstance));
 app.use("/api/employees", EmployeeRoutes(knexInstance));
 app.use("/api/borrowers", BorrowerRoutes(knexInstance));
 app.use("/api/assets", AssetRoutes(knexInstance));
+app.use("/api/auth", AuthRoutes(knexInstance));
 
 // Start the server
 app.listen(3000, () => {

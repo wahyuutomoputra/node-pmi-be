@@ -2,7 +2,7 @@ export interface IEmployee {
     id_pegawai: number;
     nama: string | null;
     email: string;
-    password: number | null;
+    password?: string | null;
     id_divisi: number;
   }
   
