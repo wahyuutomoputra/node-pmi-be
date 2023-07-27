@@ -4,4 +4,5 @@ export interface loginRes {
   isLoggedIn: boolean;
   message: string;
   user: IEmployee | null;
+  token: string;
 }

@@ -52,3 +52,21 @@ export async function responseError(params: {
     data: data,
   });
 }
+
+export async function responseCode(params: {
+  data?: any;
+  res: Response;
+  message?: string;
+  code: number;
+}) {
+  const message = params.message || "something wrong...";
+  const data = params.data || null;
+
+  params.res.status(params.code).json({
+    meta: {
+      code: params.code,
+      message: message,
+    },
+    data: data,
+  });
+}

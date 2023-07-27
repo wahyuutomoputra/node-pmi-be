@@ -1,3 +1,4 @@
+import { createToken } from "../../../middleware/AuthMiddleware";
 import { EmployeeRepository } from "../../employee/repositories/EmployeeRepository";
 import { loginRes } from "../response";
 import { login } from "../types";
@@ -17,6 +18,7 @@ export class AuthService {
         isLoggedIn: false,
         message: "no user found",
         user: null,
+        token: "",
       };
     }
 
@@ -30,15 +32,19 @@ export class AuthService {
         isLoggedIn: false,
         message: "password false",
         user: null,
+        token: "",
       };
     }
 
     delete userData.password;
 
+    const token = createToken(userData);
+
     return {
       isLoggedIn: true,
       message: "success",
       user: userData,
+      token,
     };
   }
 
