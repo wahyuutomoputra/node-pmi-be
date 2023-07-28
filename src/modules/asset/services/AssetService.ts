@@ -17,12 +17,17 @@ export class AssetService {
     return await this.assetRepository.get();
   }
 
-  public async getPaginatedAssets(pageNumber: number, searchTerm: string) {
-    return await this.assetRepository.getPaginatedAssets(
-      pageNumber,
-      10,
-      searchTerm
-    );
+  public async getPaginatedAssets(param: {
+    pageNumber: number;
+    searchTerm: string;
+    status?: string;
+  }) {
+    return await this.assetRepository.getPaginatedAssets({
+      pageNumber: param.pageNumber,
+      pageSize: 10,
+      searchTerm: param.searchTerm,
+      status: param.status,
+    });
   }
 
   // Metode lainnya untuk logika bisnis terkait pengguna

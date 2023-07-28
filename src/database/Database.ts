@@ -40,7 +40,7 @@ class Database {
         password: "root",
         database: "skripsi",
       },
-      debug: true
+      //debug: true
     });
   }
 

@@ -12,19 +12,20 @@ export class AssetRepository {
 
   public async create(data: addAsset) {
     const insert = await this.knex(this.table).insert(data);
-    console.log(insert.toString())
-    return insert
+    console.log(insert.toString());
+    return insert;
   }
 
   public async get(): Promise<IAsset[]> {
     return await this.knex<IAsset>(this.table);
   }
 
-  public async getPaginatedAssets(
-    pageNumber: number,
-    pageSize: number,
-    searchTerm: string
-  ): Promise<{
+  public async getPaginatedAssets(param: {
+    pageNumber: number;
+    pageSize: number;
+    searchTerm: string;
+    status?: string;
+  }): Promise<{
     assets: IPaginateAsset[];
     total: number;
     totalPages: number;
@@ -36,36 +37,52 @@ export class AssetRepository {
       //   .first()) as {
       //   total: 0;
       // };
-      const countQuery = await this.knex("assets as a")
+      param.status = param.status ?? "";
+
+      const countQuery = this.knex("assets as a")
         .join("divisions as d", "a.id_divisi", "d.id_divisi")
         .join("types as t", "a.id_jenis", "t.id_jenis")
-        .where("a.nama_asset", "like", `%${searchTerm}%`)
+        .where("a.nama_asset", "like", `%${param.searchTerm}%`)
         .count("a.id_asset as total");
 
-      const total = countQuery[0].total as number;
-      // const { total } = totalRows;
-      const totalPages = Math.ceil(total / pageSize);
+      if (param.status !== "") {
+        countQuery.andWhere("a.status", param.status);
+      }
+      
+      // console.log(countQuery.toSQL().toNative());
+      const countResult = await countQuery;
 
-      if (pageNumber > totalPages) {
-        pageNumber = totalPages;
+      let total = countResult[0].total as number;
+      if (total == 0) total = 1;
+      // const { total } = totalRows;
+      const totalPages = Math.ceil(total / param.pageSize);
+
+      if (param.pageNumber > totalPages) {
+        param.pageNumber = totalPages;
       }
 
-      const offset = (pageNumber - 1) * pageSize;
+      const offset = (param.pageNumber - 1) * param.pageSize;
 
       // Fetch paginated assets
-      const assets: IPaginateAsset[] = await this.knex("assets as a")
+      const assetsQuery = this.knex("assets as a")
         .join("divisions as d", "a.id_divisi", "d.id_divisi")
         .join("types as t", "a.id_jenis", "t.id_jenis")
         .select("a.*", "d.nama_divisi", "t.nama_jenis")
-        .where("a.nama_asset", "like", `%${searchTerm}%`)
-        .limit(pageSize)
+        .where("a.nama_asset", "like", `%${param.searchTerm}%`)
+        .limit(param.pageSize)
         .offset(offset);
+
+      if (param.status !== "") {
+        assetsQuery.andWhere("a.status", param.status);
+      }
+
+      const assets: IPaginateAsset[] = await assetsQuery;
 
       return {
         assets,
         total,
         totalPages,
-        currentPage: pageNumber,
+        currentPage: param.pageNumber,
       };
     } catch (error) {
       throw error;
