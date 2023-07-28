@@ -1,7 +1,6 @@
 import { Knex } from "knex";
 import { IAsset, IPaginateAsset, addAsset } from "../types";
 
-
 export class AssetRepository {
   private knex: Knex;
   private table: string;
@@ -12,7 +11,9 @@ export class AssetRepository {
   }
 
   public async create(data: addAsset) {
-    return await this.knex(this.table).insert(data);
+    const insert = await this.knex(this.table).insert(data);
+    console.log(insert.toString())
+    return insert
   }
 
   public async get(): Promise<IAsset[]> {
@@ -21,7 +22,8 @@ export class AssetRepository {
 
   public async getPaginatedAssets(
     pageNumber: number,
-    pageSize: number
+    pageSize: number,
+    searchTerm: string
   ): Promise<{
     assets: IPaginateAsset[];
     total: number;
@@ -29,12 +31,19 @@ export class AssetRepository {
     currentPage: number;
   }> {
     try {
-      const totalRows: { total: number } = (await this.knex(this.table)
-        .count("id_asset as total")
-        .first()) as {
-        total: 0;
-      };
-      const { total } = totalRows;
+      // const totalRows: { total: number } = (await this.knex(this.table)
+      //   .count("id_asset as total")
+      //   .first()) as {
+      //   total: 0;
+      // };
+      const countQuery = await this.knex("assets as a")
+        .join("divisions as d", "a.id_divisi", "d.id_divisi")
+        .join("types as t", "a.id_jenis", "t.id_jenis")
+        .where("a.nama_asset", "like", `%${searchTerm}%`)
+        .count("a.id_asset as total");
+
+      const total = countQuery[0].total as number;
+      // const { total } = totalRows;
       const totalPages = Math.ceil(total / pageSize);
 
       if (pageNumber > totalPages) {
@@ -48,6 +57,7 @@ export class AssetRepository {
         .join("divisions as d", "a.id_divisi", "d.id_divisi")
         .join("types as t", "a.id_jenis", "t.id_jenis")
         .select("a.*", "d.nama_divisi", "t.nama_jenis")
+        .where("a.nama_asset", "like", `%${searchTerm}%`)
         .limit(pageSize)
         .offset(offset);
 

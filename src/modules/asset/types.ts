@@ -8,6 +8,7 @@ export interface IAsset {
   tarif: number;
   status: string;
   id_divisi: number;
+  asset_code: string
 }
 
 export interface addAsset {
@@ -19,6 +20,7 @@ export interface addAsset {
   masa_manfaat?: number;
   harga_perolehan?: number;
   tarif?: number;
+  asset_code: string
 }
 
 export interface IPaginateAsset extends IAsset {

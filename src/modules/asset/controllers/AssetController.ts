@@ -31,11 +31,13 @@ export class AssetController {
         id_jenis: input.id_jenis,
         masa_manfaat: input.masa_manfaat,
         nama_asset: input.name,
-        status: input.status,
+        status: 'tersedia',
         tarif: input.tarif,
         tgl_masuk: input.tgl_masuk,
+        asset_code: input.asset_code
       });
     } catch (error) {
+      console.log(error)
       responseError({ res });
       return;
     }
@@ -55,12 +57,18 @@ export class AssetController {
       responseErrorInput({ res, error });
       return;
     }
+
+    input.searchTerm = input.searchTerm ?? "";
+
     try {
-      let data = await this.assetService.getPaginatedAssets(input.page);
+      let data = await this.assetService.getPaginatedAssets(
+        input.page,
+        input.searchTerm
+      );
       responseOk({ res, data });
       return;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       responseError({ res });
     }
   };
