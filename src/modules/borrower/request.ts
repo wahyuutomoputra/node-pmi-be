@@ -29,4 +29,13 @@ import {
     @IsIn(["1", "0"])
     id_instansi!: number;
   }
+
+  export class paginateBorrowerReq {
+    @IsDefined()
+    @IsNotEmpty()
+    page!: number;
+  
+    search!: string;
+    limit!: number;
+  }
   
