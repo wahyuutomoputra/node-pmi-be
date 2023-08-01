@@ -6,6 +6,21 @@ export interface ILoan {
   tgl_pinjam: Date;
   tgl_pengembalian: Date;
   tgl_deadline: Date;
+  keterangan: string;
+}
+
+export interface ILoanUser extends ILoan {
+  nama_peminjam: string;
+  nama_instansi: string;
+}
+
+export interface IDetailLoan {
+  nama_asset: string;
+  id_detail_peminjaman: number;
+  id_peminjaman: number;
+  id_asset: number;
+  is_approved: number;
+  tgl_approve: Date;
 }
 
 export interface addLoan {
@@ -23,6 +38,7 @@ export interface createLoan {
   tgl_deadline: string;
   id_peminjam: number;
   id_pegawai: number;
+  keterangan: string;
 }
 
 export interface ISelectAsset {
@@ -36,6 +52,8 @@ export interface ISelectLoan {
   tgl_pinjam: Date;
   tgl_deadline: Date;
   status: string;
+  nama_peminjam: string;
+  keterangan: string;
 }
 export interface ISelectLoanByDivisi extends ISelectLoan {
   id_divisi: number;

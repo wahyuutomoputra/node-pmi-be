@@ -33,6 +33,7 @@ export class LoanService {
       tgl_pinjam: data.tgl_pinjam,
       listOfAssetss: data.listOfAssetss,
       id_pegawai: data.id_pegawai,
+      keterangan: data.keterangan,
     });
   }
 
@@ -53,6 +54,20 @@ export class LoanService {
       status,
     });
     return loan;
+  }
+
+  public async get_loan_detail(id_peminjaman: number) {
+    try {
+      const loan = await this.loanRepository.get_loan_by_id(id_peminjaman);
+      const detail = await this.loanRepository.get_loan_detail(id_peminjaman);
+
+      return {
+        loan,
+        detail,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   // Metode lainnya untuk logika bisnis terkait pengguna

@@ -20,6 +20,7 @@ export default function LoanRoutes(knexInstance: Knex) {
   router.post("/", loanController.addLoan);
   router.get("/divisi", loanController.getlLoanDivisi);
   router.get("/all", loanController.getlLoanAll);
+  router.get("/:id", loanController.getlLoanById);
 
   return router;
 }

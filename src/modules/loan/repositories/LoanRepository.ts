@@ -1,6 +1,8 @@
 import { Knex } from "knex";
 import {
+  IDetailLoan,
   ILoan,
+  ILoanUser,
   ISelectAsset,
   ISelectLoan,
   ISelectLoanByDivisi,
@@ -79,6 +81,7 @@ export class LoanRepository {
             id_peminjam: param.id_peminjam,
             status: "diproses",
             id_pegawai: param.id_pegawai,
+            keterangan: param.keterangan,
           })
           .transacting(trx)
           .returning("id_peminjaman");
@@ -121,11 +124,14 @@ export class LoanRepository {
         "l.tgl_pinjam",
         "l.tgl_deadline",
         "l.status",
-        "d.id_divisi"
+        "d.id_divisi",
+        "b.nama_peminjam",
+        "l.keterangan"
       )
       .join("loan_details as ld", "l.id_peminjaman", "=", "ld.id_peminjaman")
       .join("assets as a", "ld.id_asset", "=", "a.id_asset")
       .join("divisions as d", "a.id_divisi", "=", "d.id_divisi")
+      .join("borrowers as b", "l.id_peminjam", "=", "b.id_peminjam")
       .where("d.id_divisi", param.id_divisi)
       .andWhere("l.status", param.status)
       .groupBy(
@@ -133,7 +139,9 @@ export class LoanRepository {
         "l.tgl_pinjam",
         "l.tgl_deadline",
         "l.status",
-        "d.id_divisi"
+        "d.id_divisi",
+        "b.nama_peminjam",
+        "l.keterangan"
       )
       .offset(offset)
       .limit(pageSize);
@@ -142,6 +150,7 @@ export class LoanRepository {
       .join("loan_details as ld", "l.id_peminjaman", "=", "ld.id_peminjaman")
       .join("assets as a", "ld.id_asset", "=", "a.id_asset")
       .join("divisions as d", "a.id_divisi", "=", "d.id_divisi")
+      .join("borrowers as b", "l.id_peminjam", "=", "b.id_peminjam")
       .where("d.id_divisi", 1)
       .andWhere("l.status", param.status)
       .select(this.knex.raw("COUNT(DISTINCT l.id_peminjaman) as count"));
@@ -187,7 +196,13 @@ export class LoanRepository {
     const totalPages = Math.ceil(totalRows / param.pageSize);
 
     const result: ISelectLoan[] = await this.knex("loans as l")
-      .select("l.id_peminjaman", "l.tgl_pinjam", "l.tgl_deadline", "l.status")
+      .select(
+        "l.id_peminjaman",
+        "l.tgl_pinjam",
+        "l.tgl_deadline",
+        "l.status",
+        "l.keterangan"
+      )
       .where("status", param.status)
       .offset(offset)
       .limit(pageSize);
@@ -198,5 +213,23 @@ export class LoanRepository {
       totalPages: totalPages,
       currentPage: param.page,
     };
+  }
+
+  public async get_loan_by_id(id_peminjaman: number): Promise<ILoanUser> {
+    const data: ILoanUser = await this.knex("loans as l")
+      .select("l.*", "b.nama_peminjam", "i.nama_instansi")
+      .join("borrowers as b", "l.id_peminjam", "=", "b.id_peminjam")
+      .join("instances as i", "b.id_instansi", "=", "i.id_instansi")
+      .where("l.id_peminjaman", id_peminjaman)
+      .first();
+    return data;
+  }
+
+  public async get_loan_detail(id_peminjaman: number): Promise<IDetailLoan[]> {
+    const result: IDetailLoan[] = await this.knex("loan_details as ld")
+      .select("ld.*", "a.nama_asset")
+      .join("assets as a", "ld.id_asset", "=", "a.id_asset")
+      .where("ld.id_peminjaman", id_peminjaman);
+    return result;
   }
 }

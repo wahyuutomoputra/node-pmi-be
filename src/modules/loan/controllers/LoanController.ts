@@ -68,6 +68,7 @@ export class LoanController {
         listOfAssetss: input.listOfAssetss,
         tgl_pinjam: input.tgl_pinjam,
         id_pegawai: 1,
+        keterangan: input.keterangan,
       });
     } catch (err) {
       responseError({ res, message: err });
@@ -113,6 +114,17 @@ export class LoanController {
       responseOk({ res, data });
     } catch (err) {
       responseError({ res, message: err });
+      return;
+    }
+  };
+
+  public getlLoanById = async (req: Request, res: Response) => {
+    try {
+      const id = (req.params.id as unknown as number) ?? 0;
+      let data = await this.loanService.get_loan_detail(id);
+      responseOk({ res, data });
+    } catch (err) {
+      responseError({ res });
       return;
     }
   };

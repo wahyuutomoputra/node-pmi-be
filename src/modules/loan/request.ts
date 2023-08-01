@@ -63,6 +63,10 @@ export class createLoanReq {
   @IsDefined()
   @IsNotEmpty()
   id_peminjam!: number;
+
+  @IsDefined()
+  @IsNotEmpty()
+  keterangan!: string
 }
 
 export class getLoanAllReq {
