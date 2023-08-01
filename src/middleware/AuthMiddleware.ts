@@ -9,7 +9,7 @@ const secretKeyJwt = "pmi-banyumas"; // Ganti dengan kunci rahasia Anda yang kua
 // Fungsi untuk membuat token
 export function createToken(data: IEmployee): string {
   delete data.password;
-  return jwt.sign(data, secretKeyJwt, { expiresIn: "24h" }); // Token akan berlaku selama 1 jam
+  return jwt.sign(data, secretKeyJwt, { expiresIn: "14d" }); // Token akan berlaku selama 1 jam
 }
 
 // Middleware untuk memverifikasi token

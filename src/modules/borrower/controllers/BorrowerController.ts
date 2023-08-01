@@ -54,7 +54,7 @@ export class BorrowerController {
 
     try {
       let data = await this.borrowerService.getPaginatedBorrower({
-        pageNumber: input.page,
+        pageNumber: input.page ?? 1,
         searchTerm: input.search,
         limit: input.limit,
       });

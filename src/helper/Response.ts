@@ -39,10 +39,18 @@ export async function responseOk(params: {
 export async function responseError(params: {
   data?: any;
   res: Response;
-  message?: string;
+  message?: string | unknown;
 }) {
-  const message = params.message || "something wrong...";
+  let message: string = "something wrong...";
   const data = params.data || null;
+
+  if (typeof params.message == "string") {
+    message = params.message;
+  }
+
+  if (params.message instanceof Error) {
+    message = params?.message.message;
+  }
 
   params.res.status(500).json({
     meta: {

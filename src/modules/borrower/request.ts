@@ -31,10 +31,7 @@ import {
   }
 
   export class paginateBorrowerReq {
-    @IsDefined()
-    @IsNotEmpty()
     page!: number;
-  
     search!: string;
     limit!: number;
   }

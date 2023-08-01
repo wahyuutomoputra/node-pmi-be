@@ -16,6 +16,7 @@ import EmployeeRoutes from "./routes/EmployeeRoutes";
 import BorrowerRoutes from "./routes/BorrowerRoutes";
 import AssetRoutes from "./routes/AssetRoutes";
 import AuthRoutes from "./routes/AuthRoutes";
+import LoanRoutes from "./routes/LoanRoutes";
 import { verifyToken } from "./middleware/AuthMiddleware";
 import { IEmployee } from "./modules/employee/types";
 
@@ -51,6 +52,7 @@ app.use("/api/employees", EmployeeRoutes(knexInstance));
 app.use("/api/borrowers", BorrowerRoutes(knexInstance));
 app.use("/api/assets", AssetRoutes(knexInstance));
 app.use("/api/auth", AuthRoutes(knexInstance));
+app.use("/api/loans", LoanRoutes(knexInstance));
 
 // Start the server
 app.listen(3000, () => {
