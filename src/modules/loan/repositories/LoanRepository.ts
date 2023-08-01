@@ -7,7 +7,7 @@ import {
   addLoan,
   createLoan,
 } from "../types";
-import { IDivision } from "@modules/division/types";
+import { IDivision } from "../../division/types";
 
 export class LoanRepository {
   private knex: Knex;
