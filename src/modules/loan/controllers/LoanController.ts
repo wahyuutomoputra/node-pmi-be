@@ -9,6 +9,8 @@ import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
 import {
   addLoanReq,
+  approveLoanReq,
+  approveReq,
   createLoanReq,
   getLoanAllReq,
   getLoanReq,
@@ -121,12 +123,86 @@ export class LoanController {
   public getlLoanById = async (req: Request, res: Response) => {
     try {
       const id = (req.params.id as unknown as number) ?? 0;
-      let data = await this.loanService.get_loan_detail(id);
+      const id_divisi =
+        (req.params.id_divisi as unknown as number) ?? undefined;
+
+      let data = await this.loanService.get_loan_detail(id, id_divisi);
       responseOk({ res, data });
     } catch (err) {
       responseError({ res });
       return;
     }
+  };
+
+  public approve_loan = async (req: Request, res: Response) => {
+    const input = plainToClass(approveLoanReq, req.body);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+
+    try {
+      let data = await this.loanService.approve_loan(
+        input.list_approve,
+        input.id_peminjaman
+      );
+      responseOk({ res, data });
+    } catch (err) {
+      responseError({ res });
+      return;
+    }
+  };
+
+  public approve = async (req: Request, res: Response) => {
+    const input = plainToClass(approveReq, req.body);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+    try {
+      await this.loanService.approve(input.id_peminjaman);
+    } catch (err) {
+      responseError({ res, message: err });
+      return;
+    }
+
+    responseOk({ res });
+  };
+
+  public reject = async (req: Request, res: Response) => {
+    const input = plainToClass(approveReq, req.body);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+    try {
+      await this.loanService.reject(input.id_peminjaman);
+    } catch (err) {
+      responseError({ res, message: err });
+      return;
+    }
+
+    responseOk({ res });
+  };
+
+  public pengembalian = async (req: Request, res: Response) => {
+    const input = plainToClass(approveReq, req.body);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+    try {
+      await this.loanService.pengembalian(input.id_peminjaman);
+    } catch (err) {
+      responseError({ res, message: err });
+      return;
+    }
+
+    responseOk({ res });
   };
 
   // Metode lainnya untuk menangani permintaan HTTP terkait pengguna

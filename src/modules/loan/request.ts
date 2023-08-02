@@ -66,17 +66,33 @@ export class createLoanReq {
 
   @IsDefined()
   @IsNotEmpty()
-  keterangan!: string
+  keterangan!: string;
 }
 
 export class getLoanAllReq {
-  page!: number
-  status!: string
+  page!: number;
+  status!: string;
 }
 export class getLoanReq {
   @IsDefined()
   @IsNotEmpty()
   id_divisi!: number;
-  page!: number
-  status!: string
+  page!: number;
+  status!: string;
+}
+
+export class approveLoanReq {
+  @IsDefined()
+  @IsNotEmpty()
+  list_approve!: number[];
+
+  @IsDefined()
+  @IsNotEmpty()
+  id_peminjaman!: number;
+}
+
+export class approveReq {
+  @IsDefined()
+  @IsNotEmpty()
+  id_peminjaman!: number;
 }

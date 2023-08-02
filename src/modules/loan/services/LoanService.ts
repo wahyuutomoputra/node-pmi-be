@@ -56,18 +56,46 @@ export class LoanService {
     return loan;
   }
 
-  public async get_loan_detail(id_peminjaman: number) {
+  public async get_loan_detail(id_peminjaman: number, id_divisi?: number) {
     try {
       const loan = await this.loanRepository.get_loan_by_id(id_peminjaman);
-      const detail = await this.loanRepository.get_loan_detail(id_peminjaman);
+      const detail = await this.loanRepository.get_loan_detail(
+        id_peminjaman,
+        id_divisi
+      );
+      let selectedAsset: number[] = [];
+
+      detail.forEach((x) => {
+        if (x.is_approved == 1) selectedAsset.push(x.id_asset);
+      });
 
       return {
         loan,
         detail,
+        selectedAsset,
       };
     } catch (error) {
       throw error;
     }
+  }
+
+  public async approve_loan(list_approve: number[], id_peminjaman: number) {
+    return await this.loanRepository.approval(list_approve, id_peminjaman);
+  }
+
+  public async approve(id_peminjaman: number) {
+    const loan = await this.loanRepository.approve(id_peminjaman);
+    return loan;
+  }
+
+  public async reject(id_peminjaman: number) {
+    const loan = await this.loanRepository.reject(id_peminjaman);
+    return loan;
+  }
+
+  public async pengembalian(id_peminjaman: number) {
+    const loan = await this.loanRepository.pengembalian(id_peminjaman);
+    return loan;
   }
 
   // Metode lainnya untuk logika bisnis terkait pengguna

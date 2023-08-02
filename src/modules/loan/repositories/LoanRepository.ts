@@ -10,6 +10,7 @@ import {
   createLoan,
 } from "../types";
 import { IDivision } from "../../division/types";
+import { format } from "date-fns";
 
 export class LoanRepository {
   private knex: Knex;
@@ -89,7 +90,8 @@ export class LoanRepository {
         const loanItemsToInsert = availableItems.map((item) => ({
           id_peminjaman: loanId,
           id_asset: item.id_asset,
-          is_approved: item.nama_divisi.toUpperCase() == "UMUM" ? 1 : 0,
+          // is_approved: item.nama_divisi.toUpperCase() == "UMUM" ? 1 : 0,
+          is_approved: 0,
         }));
 
         await this.knex("loan_details")
@@ -190,7 +192,7 @@ export class LoanRepository {
 
     const totalRowsQuery = await this.knex("loans as l")
       .count("l.id_peminjaman as totalRows")
-      .where("status", "diproses");
+      // .where("status", "diproses");
 
     const totalRows = totalRowsQuery[0].totalRows as number;
     const totalPages = Math.ceil(totalRows / param.pageSize);
@@ -201,9 +203,11 @@ export class LoanRepository {
         "l.tgl_pinjam",
         "l.tgl_deadline",
         "l.status",
-        "l.keterangan"
+        "l.keterangan",
+        "b.nama_peminjam"
       )
-      .where("status", param.status)
+      .join("borrowers as b", "b.id_peminjam", "l.id_peminjam")
+      // .where("status", param.status)
       .offset(offset)
       .limit(pageSize);
 
@@ -225,11 +229,137 @@ export class LoanRepository {
     return data;
   }
 
-  public async get_loan_detail(id_peminjaman: number): Promise<IDetailLoan[]> {
-    const result: IDetailLoan[] = await this.knex("loan_details as ld")
-      .select("ld.*", "a.nama_asset")
+  public async get_loan_detail(
+    id_peminjaman: number,
+    id_divisi?: number
+  ): Promise<IDetailLoan[]> {
+    const query = this.knex("loan_details as ld")
+      .select("ld.*", "a.nama_asset", "a.asset_code", "d.nama_divisi")
       .join("assets as a", "ld.id_asset", "=", "a.id_asset")
+      .join("divisions as d", "d.id_divisi", "a.id_divisi")
       .where("ld.id_peminjaman", id_peminjaman);
+
+    if (id_divisi != undefined) {
+      query.andWhere("a.id_divisi", id_divisi);
+    }
+
+    const result: IDetailLoan[] = await query;
     return result;
+  }
+
+  public async approval(list_approve: number[], id_peminjaman: number) {
+    const currentDate = new Date();
+
+    try {
+      return await this.knex.transaction(async (trx) => {
+        await trx("loan_details")
+          .andWhere("id_peminjaman", id_peminjaman)
+          .update({
+            is_approved: 0,
+            tgl_approve: null,
+          });
+
+        await trx("loan_details")
+          .whereIn("id_asset", list_approve)
+          .andWhere("id_peminjaman", id_peminjaman)
+          .update({
+            is_approved: 1,
+            tgl_approve: format(currentDate, "yyyy-MM-dd"),
+          });
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async approve(id_peminjaman: number) {
+    try {
+      await this.knex.transaction(async (trx) => {
+        await trx("loans").where("id_peminjaman", id_peminjaman).update({
+          status: "dipinjam",
+        });
+
+        const detailLoan: IDetailLoan[] = await trx("loan_details as ld")
+          .select("ld.*", "a.nama_asset", "a.asset_code")
+          .join("assets as a", "ld.id_asset", "=", "a.id_asset")
+          .where("ld.id_peminjaman", id_peminjaman);
+
+        const approvedAssetIds = detailLoan
+          .filter((loanDetail) => loanDetail.is_approved == 1)
+          .map((loanDetail) => loanDetail.id_asset);
+
+        const notApprovedAssetIds = detailLoan
+          .filter((loanDetail) => loanDetail.is_approved == 0)
+          .map((loanDetail) => loanDetail.id_asset);
+
+        if (approvedAssetIds.length != 0) {
+          await trx("assets").whereIn("id_asset", approvedAssetIds).update({
+            status: "dipinjam",
+          });
+        }
+
+        if (notApprovedAssetIds.length != 0) {
+          await trx("assets").whereIn("id_asset", notApprovedAssetIds).update({
+            status: "tersedia",
+          });
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async reject(id_peminjaman: number) {
+    try {
+      await this.knex.transaction(async (trx) => {
+        await trx("loans").where("id_peminjaman", id_peminjaman).update({
+          status: "ditolak",
+        });
+
+        const detailLoan: IDetailLoan[] = await trx("loan_details as ld")
+          .select("ld.*", "a.nama_asset", "a.asset_code")
+          .join("assets as a", "ld.id_asset", "=", "a.id_asset")
+          .where("ld.id_peminjaman", id_peminjaman);
+
+        const idBarang = detailLoan.map((x) => x.id_asset);
+
+        if (idBarang.length != 0) {
+          await trx("assets").whereIn("id_asset", idBarang).update({
+            status: "tersedia",
+          });
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async pengembalian(id_peminjaman: number) {
+    try {
+      await this.knex.transaction(async (trx) => {
+        await trx("loans")
+          .where("id_peminjaman", id_peminjaman)
+          .update({
+            status: "dikembalikan",
+            tgl_pengembalian: format(new Date(), "yyyy-MM-dd"),
+          });
+
+        const detailLoan: IDetailLoan[] = await trx("loan_details as ld")
+          .select("ld.*", "a.nama_asset", "a.asset_code")
+          .join("assets as a", "ld.id_asset", "=", "a.id_asset")
+          .where("ld.id_peminjaman", id_peminjaman)
+          .andWhere("ld.is_approved", 1);
+
+        const idBarang = detailLoan.map((x) => x.id_asset);
+
+        if (idBarang.length != 0) {
+          await trx("assets").whereIn("id_asset", idBarang).update({
+            status: "tersedia",
+          });
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 }

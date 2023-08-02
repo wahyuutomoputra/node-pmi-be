@@ -19,9 +19,9 @@ export class EmployeeRepository {
   }
 
   public async getByEmail(email: string): Promise<IEmployee> {
-    return await this.knex
-      .select()
-      .from(this.table)
+    return await this.knex("employees as e")
+      .select("e.*", this.knex.raw("LOWER(d.nama_divisi) as nama_divisi"))
+      .join("divisions as d", "e.id_divisi", "d.id_divisi")
       .where("email", "=", email)
       .first();
   }
