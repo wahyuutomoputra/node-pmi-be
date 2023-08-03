@@ -17,11 +17,13 @@ export default function LoanRoutes(knexInstance: Knex) {
   router.post("/", loanController.addLoan);
   router.get("/divisi", loanController.getlLoanDivisi);
   router.get("/all", loanController.getlLoanAll);
-  router.get("/:id", loanController.getlLoanById);
-  router.get("/:id/:id_divisi", loanController.getlLoanById);
   router.post("/commit_approve", loanController.approve);
+  router.post("/approve_divisi", loanController.approve_divisi);
   router.post("/commit_reject", loanController.reject);
   router.post("/pengembalian", loanController.pengembalian);
+  router.get("/calendar", loanController.calendar);
+  router.get("/:id", loanController.getlLoanById);
+  router.get("/:id/:id_divisi", loanController.getlLoanById);
 
   return router;
 }

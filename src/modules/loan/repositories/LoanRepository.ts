@@ -176,28 +176,20 @@ export class LoanRepository {
   }
 
   public async get_loan_all(param: {
-    page: number;
-    pageSize: number;
-    status?: string;
+    page?: number;
+    pageSize?: number;
+    status?: string | string[];
+    year?: number;
   }): Promise<{
     loan: ISelectLoan[];
     total: number;
     totalPages: number;
     currentPage: number;
   }> {
-    const { page, pageSize } = param;
-    const offset = (page - 1) * pageSize;
+    param.status = param.status ?? "";
 
-    param.status = param.status ?? "diproses";
-
-    const totalRowsQuery = await this.knex("loans as l")
-      .count("l.id_peminjaman as totalRows")
-      // .where("status", "diproses");
-
-    const totalRows = totalRowsQuery[0].totalRows as number;
-    const totalPages = Math.ceil(totalRows / param.pageSize);
-
-    const result: ISelectLoan[] = await this.knex("loans as l")
+    const count = this.knex("loans as l").count("l.id_peminjaman as totalRows");
+    const resultQuery = this.knex("loans as l")
       .select(
         "l.id_peminjaman",
         "l.tgl_pinjam",
@@ -206,16 +198,53 @@ export class LoanRepository {
         "l.keterangan",
         "b.nama_peminjam"
       )
-      .join("borrowers as b", "b.id_peminjam", "l.id_peminjam")
-      // .where("status", param.status)
-      .offset(offset)
-      .limit(pageSize);
+      .join("borrowers as b", "b.id_peminjam", "l.id_peminjam");
+
+    if (param.page && param.pageSize) {
+      const { page, pageSize } = param;
+      const offset = (page - 1) * pageSize;
+      resultQuery.offset(offset).limit(pageSize);
+    }
+
+    if (param.year) {
+      count.whereRaw("YEAR(l.tgl_pinjam) = ?", [param.year]);
+      resultQuery.whereRaw("YEAR(l.tgl_pinjam) = ?", [param.year]);
+    }
+
+    if (typeof param.status == "string" && param.status != "") {
+      count.where("status", param.status);
+      resultQuery.where("status", param.status);
+    }
+
+    if (Array.isArray(param.status)) {
+      count.whereIn("status", param.status);
+      resultQuery.whereIn("status", param.status);
+    }
+
+    const totalRowsQuery = await count;
+
+    let totalRows = 0;
+    let totalPages = 0;
+    if (param.page && param.pageSize) {
+      totalRows = totalRowsQuery[0].totalRows as number;
+      totalPages = Math.ceil(totalRows / param.pageSize);
+    }
+
+    let result: ISelectLoan[] = await resultQuery;
+
+    result = result.map((x) => {
+      return {
+        ...x,
+        tgl_pinjam: format(new Date(x.tgl_pinjam), "yyyy-MM-dd"),
+        tgl_deadline: format(new Date(x.tgl_deadline), "yyyy-MM-dd"),
+      };
+    });
 
     return {
       loan: result,
       total: totalRows,
       totalPages: totalPages,
-      currentPage: param.page,
+      currentPage: param.page ?? 0,
     };
   }
 
@@ -247,25 +276,36 @@ export class LoanRepository {
     return result;
   }
 
-  public async approval(list_approve: number[], id_peminjaman: number) {
+  public async approval_divisi(
+    list_approve: number[],
+    id_peminjaman: number,
+    id_divisi: number
+  ) {
     const currentDate = new Date();
 
     try {
       return await this.knex.transaction(async (trx) => {
-        await trx("loan_details")
+        // reset semua approval barang divisi yang dipinjam
+        await trx("loan_details as ld")
+          .join("assets as a", "ld.id_asset", "a.id_asset")
+          .join("divisions as d", "d.id_divisi", "a.id_divisi")
+          .where("d.id_divisi", id_divisi)
           .andWhere("id_peminjaman", id_peminjaman)
           .update({
             is_approved: 0,
             tgl_approve: null,
           });
 
-        await trx("loan_details")
-          .whereIn("id_asset", list_approve)
-          .andWhere("id_peminjaman", id_peminjaman)
-          .update({
-            is_approved: 1,
-            tgl_approve: format(currentDate, "yyyy-MM-dd"),
-          });
+        if (list_approve.length != 0) {
+          // assign ulang barang divisi
+          await trx("loan_details")
+            .whereIn("id_asset", list_approve)
+            .andWhere("id_peminjaman", id_peminjaman)
+            .update({
+              is_approved: 1,
+              tgl_approve: format(currentDate, "yyyy-MM-dd"),
+            });
+        }
       });
     } catch (error) {
       throw error;

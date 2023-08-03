@@ -71,7 +71,7 @@ export class createLoanReq {
 
 export class getLoanAllReq {
   page!: number;
-  status!: string;
+  status!: string | string[];
 }
 export class getLoanReq {
   @IsDefined()
@@ -89,10 +89,22 @@ export class approveLoanReq {
   @IsDefined()
   @IsNotEmpty()
   id_peminjaman!: number;
+
+  @IsDefined()
+  @IsNotEmpty()
+  id_divisi!: number;
 }
 
 export class approveReq {
   @IsDefined()
   @IsNotEmpty()
   id_peminjaman!: number;
+}
+
+export class getLoanCalendarReq {
+  @IsDefined()
+  @IsNotEmpty()
+  year!: number;
+
+  status!: string | string[];
 }

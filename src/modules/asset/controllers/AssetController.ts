@@ -75,5 +75,16 @@ export class AssetController {
     }
   };
 
+  public dashboard = async (req: Request, res: Response) => {
+    try {
+      let data = await this.assetService.dashboard();
+      responseOk({ res, data });
+      return;
+    } catch (error) {
+      console.log(error);
+      responseError({ res });
+    }
+  };
+
   // Metode lainnya untuk menangani permintaan HTTP terkait pengguna
 }

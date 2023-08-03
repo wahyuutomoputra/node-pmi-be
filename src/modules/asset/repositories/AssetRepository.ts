@@ -48,7 +48,7 @@ export class AssetRepository {
       if (param.status !== "") {
         countQuery.andWhere("a.status", param.status);
       }
-      
+
       // console.log(countQuery.toSQL().toNative());
       const countResult = await countQuery;
 
@@ -84,6 +84,27 @@ export class AssetRepository {
         totalPages,
         currentPage: param.pageNumber,
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async countByStatus(status: string): Promise<number> {
+    try {
+      const data = await this.knex("assets")
+        .count("id_asset as total")
+        .where("status", status);
+
+      return (data[0].total as number) ?? 0;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async totalHarga(): Promise<number> {
+    try {
+      const data = await this.knex("assets").sum("harga_perolehan as total");
+      return (data[0].total as number) ?? 0;
     } catch (error) {
       throw error;
     }

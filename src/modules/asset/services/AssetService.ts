@@ -30,5 +30,27 @@ export class AssetService {
     });
   }
 
+  public async dashboard() {
+    try {
+      const [dipinjam, booked, rusak, tersedia, totalHarga] = await Promise.all(
+        [
+          this.assetRepository.countByStatus("dipinjam"),
+          this.assetRepository.countByStatus("booked"),
+          this.assetRepository.countByStatus("rusak"),
+          this.assetRepository.countByStatus("tersedia"),
+          this.assetRepository.totalHarga(),
+        ]
+      );
+
+      return {
+        dipinjam: dipinjam + booked,
+        rusak,
+        tersedia,
+        totalAsset: dipinjam + rusak + tersedia + booked,
+        totalHarga,
+      };
+    } catch (error) {}
+  }
+
   // Metode lainnya untuk logika bisnis terkait pengguna
 }

@@ -49,8 +49,8 @@ export interface ISelectAsset {
 
 export interface ISelectLoan {
   id_peminjaman: number;
-  tgl_pinjam: Date;
-  tgl_deadline: Date;
+  tgl_pinjam: string;
+  tgl_deadline: string;
   status: string;
   nama_peminjam: string;
   keterangan: string;

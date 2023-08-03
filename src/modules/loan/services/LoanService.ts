@@ -47,7 +47,7 @@ export class LoanService {
     return loan;
   }
 
-  public async get_loan_all(page: number, status: string) {
+  public async get_loan_all(page: number, status: string | string[]) {
     const loan = await this.loanRepository.get_loan_all({
       page,
       pageSize: 10,
@@ -79,8 +79,16 @@ export class LoanService {
     }
   }
 
-  public async approve_loan(list_approve: number[], id_peminjaman: number) {
-    return await this.loanRepository.approval(list_approve, id_peminjaman);
+  public async approve_divisi(
+    list_approve: number[],
+    id_peminjaman: number,
+    id_divisi: number
+  ) {
+    return await this.loanRepository.approval_divisi(
+      list_approve,
+      id_peminjaman,
+      id_divisi
+    );
   }
 
   public async approve(id_peminjaman: number) {
@@ -96,6 +104,27 @@ export class LoanService {
   public async pengembalian(id_peminjaman: number) {
     const loan = await this.loanRepository.pengembalian(id_peminjaman);
     return loan;
+  }
+
+  public async get_loan_calendar(status: string | string[], year: number) {
+    const loan = await this.loanRepository.get_loan_all({
+      status,
+      year,
+    });
+
+    let data = [];
+
+    data = loan.loan.map((x) => {
+      return {
+        id: x.id_peminjaman,
+        title: `${x.nama_peminjam} - ${x.keterangan}`,
+        start: new Date(x.tgl_pinjam),
+        end: new Date(x.tgl_deadline),
+        status: x.status,
+      };
+    });
+
+    return data;
   }
 
   // Metode lainnya untuk logika bisnis terkait pengguna

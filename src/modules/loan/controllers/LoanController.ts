@@ -13,6 +13,7 @@ import {
   approveReq,
   createLoanReq,
   getLoanAllReq,
+  getLoanCalendarReq,
   getLoanReq,
 } from "../request";
 
@@ -110,6 +111,9 @@ export class LoanController {
       return;
     }
 
+    // status[]=diproses&status[]=dikembalikan
+    // status=diproses
+
     try {
       input.page = input.page ?? 1;
       let data = await this.loanService.get_loan_all(input.page, input.status);
@@ -134,7 +138,7 @@ export class LoanController {
     }
   };
 
-  public approve_loan = async (req: Request, res: Response) => {
+  public approve_divisi = async (req: Request, res: Response) => {
     const input = plainToClass(approveLoanReq, req.body);
     const error = await validate(input);
     if (error.length > 0) {
@@ -143,9 +147,10 @@ export class LoanController {
     }
 
     try {
-      let data = await this.loanService.approve_loan(
+      let data = await this.loanService.approve_divisi(
         input.list_approve,
-        input.id_peminjaman
+        input.id_peminjaman,
+        input.id_divisi
       );
       responseOk({ res, data });
     } catch (err) {
@@ -203,6 +208,26 @@ export class LoanController {
     }
 
     responseOk({ res });
+  };
+
+  public calendar = async (req: Request, res: Response) => {
+    const input = plainToClass(getLoanCalendarReq, req.query);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+
+    try {
+      let data = await this.loanService.get_loan_calendar(
+        input.status,
+        input.year
+      );
+      responseOk({ res, data });
+    } catch (err) {
+      responseError({ res, message: err });
+      return;
+    }
   };
 
   // Metode lainnya untuk menangani permintaan HTTP terkait pengguna
