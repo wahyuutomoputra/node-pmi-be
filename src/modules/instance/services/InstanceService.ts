@@ -17,5 +17,20 @@ export class InstanceService {
     return await this.instanceRepository.get();
   }
 
+  public async getPaginatedInstance(param: {
+    pageNumber: number;
+    searchTerm: string;
+    limit?: number;
+  }) {
+    param.limit = param.limit ?? 20;
+    param.searchTerm = param.searchTerm ?? "";
+
+    return await this.instanceRepository.getPaginatedInstance({
+      pageNumber: param.pageNumber,
+      pageSize: param.limit,
+      searchTerm: param.searchTerm,
+    });
+  }
+
   // Metode lainnya untuk logika bisnis terkait pengguna
 }

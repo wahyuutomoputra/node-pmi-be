@@ -1,5 +1,6 @@
 import { Knex } from "knex";
-import { IAsset, IPaginateAsset, addAsset } from "../types";
+import { IAsset, IHarga, IPaginateAsset, addAsset } from "../types";
+import { format } from "date-fns";
 
 export class AssetRepository {
   private knex: Knex;
@@ -76,7 +77,14 @@ export class AssetRepository {
         assetsQuery.andWhere("a.status", param.status);
       }
 
-      const assets: IPaginateAsset[] = await assetsQuery;
+      let assets: IPaginateAsset[] = await assetsQuery;
+
+      assets = assets.map((x) => {
+        return {
+          ...x,
+          tgl_masuk: format(new Date(x.tgl_masuk), "yyyy-MM-dd"),
+        };
+      });
 
       return {
         assets,
@@ -105,6 +113,25 @@ export class AssetRepository {
     try {
       const data = await this.knex("assets").sum("harga_perolehan as total");
       return (data[0].total as number) ?? 0;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async harga_asset() {
+    try {
+      const query = this.knex
+        .select(
+          this.knex.raw(
+            "sum(harga_perolehan) as harga, t.nama_jenis, count(a.id_asset) as jumlah"
+          )
+        )
+        .from("assets as a")
+        .join("types as t", "a.id_jenis", "t.id_jenis")
+        .groupBy("t.nama_jenis");
+
+      const result: IHarga[] = await query;
+      return result;
     } catch (error) {
       throw error;
     }

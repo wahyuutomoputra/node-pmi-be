@@ -13,7 +13,7 @@ export default function RoleRoutes(knexInstance: Knex) {
 
   router.post("/", instanceController.createInstance);
   router.get("/", instanceController.getInstance);
-  // tambahkan rute-rute lain yang terkait dengan entitas pengguna
+  router.get("/paginate", instanceController.getPaginatedInstance);
 
   return router;
 }

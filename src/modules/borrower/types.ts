@@ -11,6 +11,7 @@ export interface addBorrower {
   nama_peminjam?: string;
   nik?: string;
   tgl_lahir?: string;
+  no_telp: string
 }
 
 export interface IPaginateBorrower extends IBorrower {

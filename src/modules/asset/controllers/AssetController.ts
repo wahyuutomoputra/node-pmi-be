@@ -86,5 +86,16 @@ export class AssetController {
     }
   };
 
+  public harga_asset = async (req: Request, res: Response) => {
+    try {
+      let data = await this.assetService.harga_asset();
+      responseOk({ res, data });
+      return;
+    } catch (error) {
+      console.log(error);
+      responseError({ res });
+    }
+  };
+
   // Metode lainnya untuk menangani permintaan HTTP terkait pengguna
 }

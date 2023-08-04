@@ -2,13 +2,13 @@ export interface IAsset {
   id_asset: number;
   nama_asset: string | null;
   id_jenis: number;
-  tgl_masuk: Date;
+  tgl_masuk: string;
   masa_manfaat: number;
   harga_perolehan: number;
   tarif: number;
   status: string;
   id_divisi: number;
-  asset_code: string
+  asset_code: string;
 }
 
 export interface addAsset {
@@ -20,10 +20,16 @@ export interface addAsset {
   masa_manfaat?: number;
   harga_perolehan?: number;
   tarif?: number;
-  asset_code: string
+  asset_code: string;
 }
 
 export interface IPaginateAsset extends IAsset {
   nama_divisi: string;
   nama_jenis: string;
+}
+
+export interface IHarga {
+  nama_jenis: string;
+  harga: number;
+  jumlah: number;
 }

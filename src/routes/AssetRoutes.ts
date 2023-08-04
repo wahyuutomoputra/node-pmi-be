@@ -15,6 +15,7 @@ export default function RoleRoutes(knexInstance: Knex) {
   router.get("/", assetController.getAsset);
   router.get("/paginate", assetController.getPaginatedAssets)
   router.get("/dashboard", assetController.dashboard)
+  router.get("/harga", assetController.harga_asset)
 
   return router;
 }

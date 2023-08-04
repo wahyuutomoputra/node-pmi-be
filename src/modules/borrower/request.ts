@@ -25,9 +25,11 @@ import {
   
     @IsDefined()
     @IsNotEmpty()
-    @IsString()
-    @IsIn(["1", "0"])
     id_instansi!: number;
+
+    @IsDefined()
+    @IsNotEmpty()
+    no_telp!: string;
   }
 
   export class paginateBorrowerReq {

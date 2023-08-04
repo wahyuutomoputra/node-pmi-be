@@ -13,4 +13,10 @@ import {
     @IsString()
     name!: string;
   }
+
+  export class paginateInstanceReq {
+    page!: number;
+    search!: string;
+    limit!: number;
+  }
   

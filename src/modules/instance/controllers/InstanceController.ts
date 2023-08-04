@@ -7,7 +7,7 @@ import {
 } from "../../../helper/Response";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
-import { addInstanceReq } from "../request";
+import { addInstanceReq, paginateInstanceReq } from "../request";
 
 export class InstanceController {
   private instanceService: InstanceService;
@@ -32,13 +32,35 @@ export class InstanceController {
       responseError({ res });
       return;
     }
-    
+
     responseOk({ res });
   };
 
   public getInstance = async (req: Request, res: Response) => {
     let data = await this.instanceService.get();
     responseOk({ res, data });
+  };
+
+  public getPaginatedInstance = async (req: Request, res: Response) => {
+    const input = plainToClass(paginateInstanceReq, req.query);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+
+    try {
+      let data = await this.instanceService.getPaginatedInstance({
+        pageNumber: input.page ?? 1,
+        searchTerm: input.search,
+        limit: input.limit,
+      });
+      responseOk({ res, data });
+      return;
+    } catch (error) {
+      console.log(error);
+      responseError({ res });
+    }
   };
 
   // Metode lainnya untuk menangani permintaan HTTP terkait pengguna

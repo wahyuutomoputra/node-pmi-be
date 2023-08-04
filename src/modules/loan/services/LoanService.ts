@@ -117,7 +117,7 @@ export class LoanService {
     data = loan.loan.map((x) => {
       return {
         id: x.id_peminjaman,
-        title: `${x.nama_peminjam} - ${x.keterangan}`,
+        title: `${x.nama_peminjam} (${x.status}) - ${x.keterangan}`,
         start: new Date(x.tgl_pinjam),
         end: new Date(x.tgl_deadline),
         status: x.status,

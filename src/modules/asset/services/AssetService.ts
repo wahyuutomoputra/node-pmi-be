@@ -1,5 +1,6 @@
 import { AssetRepository } from "../repositories/AssetRepository";
 import { IAsset, addAsset } from "../types";
+import { useRupiah } from "../../../helper/useRupiah";
 
 export class AssetService {
   private assetRepository: AssetRepository;
@@ -22,12 +23,50 @@ export class AssetService {
     searchTerm: string;
     status?: string;
   }) {
-    return await this.assetRepository.getPaginatedAssets({
+    let data = await this.assetRepository.getPaginatedAssets({
       pageNumber: param.pageNumber,
       pageSize: 10,
       searchTerm: param.searchTerm,
       status: param.status,
     });
+
+    const tanggalSekarang = new Date();
+    data.assets = data.assets.map((x) => {
+      const selisihMilisecond =
+        tanggalSekarang.getTime() - new Date(x.tgl_masuk).getTime();
+      const milisecondPerTahun = 1000 * 60 * 60 * 24 * 365.25; // Rata-rata tahun dalam milisecond
+      const milisecondPerBulan = milisecondPerTahun / 12; // Rata-rata bulan dalam milisecond
+
+      const umurTahun = Math.floor(selisihMilisecond / milisecondPerTahun);
+      const umurBulan = Math.floor(
+        (selisihMilisecond % milisecondPerTahun) / milisecondPerBulan
+      );
+      const umurHari = Math.floor(
+        (selisihMilisecond % milisecondPerBulan) / (1000 * 60 * 60 * 24)
+      );
+
+      let umurString = "";
+
+      if (umurTahun > 0) {
+        umurString += `${umurTahun} tahun, `;
+      }
+
+      if (umurBulan > 0) {
+        umurString += `${umurBulan} bulan, `;
+      }
+
+      if (umurHari > 0) {
+        umurString += `${umurHari} hari`;
+      }
+
+      return {
+        ...x,
+        umur: umurString,
+        harga: useRupiah(x.harga_perolehan),
+      };
+    });
+
+    return data;
   }
 
   public async dashboard() {
@@ -50,6 +89,16 @@ export class AssetService {
         totalHarga,
       };
     } catch (error) {}
+  }
+
+  public async harga_asset() {
+    const data = await this.assetRepository.harga_asset();
+    return data.map((x) => {
+      return {
+        ...x,
+        harga: useRupiah(x.harga),
+      };
+    });
   }
 
   // Metode lainnya untuk logika bisnis terkait pengguna

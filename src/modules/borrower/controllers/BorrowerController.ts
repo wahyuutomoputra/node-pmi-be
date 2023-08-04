@@ -30,9 +30,10 @@ export class BorrowerController {
         nama_peminjam: input.name,
         nik: input.nik,
         tgl_lahir: input.tgl_lahir,
+        no_telp: input.no_telp
       });
     } catch (error) {
-      responseError({ res });
+      responseError({ res, message: error });
       return;
     }
 
