@@ -41,6 +41,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
+const v1Router = express.Router();
+
 // Routes
 app.use("/api/users", UserRoutes(knexInstance));
 app.use("/api/roles", RoleRoutes(knexInstance));

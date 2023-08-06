@@ -97,5 +97,16 @@ export class AssetController {
     }
   };
 
+  public penyusutan = async (req: Request, res: Response) => {
+    try {
+      let data = await this.assetService.penyusutan();
+      responseOk({ res, data });
+      return;
+    } catch (error) {
+      console.log(error);
+      responseError({ res });
+    }
+  };
+
   // Metode lainnya untuk menangani permintaan HTTP terkait pengguna
 }

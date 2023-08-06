@@ -137,5 +137,34 @@ export class AssetRepository {
     }
   }
 
+  public async penyusutan() {
+    const data = await this.knex.raw(`SELECT
+          t.id_jenis,
+          t.nama_jenis AS jenis_aset,
+          SUM(IF(FLOOR(DATEDIFF(CURDATE(), a.tgl_masuk) / 365.25) > a.masa_manfaat,
+                  a.harga_perolehan * a.tarif * a.masa_manfaat,
+                  a.harga_perolehan * a.tarif / 100 * FLOOR(DATEDIFF(CURDATE(), a.tgl_masuk) / 365.25)
+              )) AS total_penyusutan,
+          SUM(a.harga_perolehan) AS total_harga_perolehan,
+          count(a.id_asset) as jumlah_asset
+      FROM
+          assets a
+      JOIN
+          types t ON a.id_jenis = t.id_jenis
+      GROUP BY
+          a.id_jenis, t.nama_jenis`);
+
+    let result = data[0] as {
+      jenis_aset: string;
+      masa_manfaat: number;
+      total_penyusutan: number;
+      total_harga_perolehan: number;
+      jumlah_asset: number;
+      id_jenis: number;
+    }[];
+
+    return result;
+  }
+
   // Metode lainnya untuk berinteraksi dengan entitas pengguna dalam database
 }

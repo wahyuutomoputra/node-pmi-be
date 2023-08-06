@@ -31,6 +31,7 @@ export class AssetService {
     });
 
     const tanggalSekarang = new Date();
+
     data.assets = data.assets.map((x) => {
       const selisihMilisecond =
         tanggalSekarang.getTime() - new Date(x.tgl_masuk).getTime();
@@ -59,10 +60,20 @@ export class AssetService {
         umurString += `${umurHari} hari`;
       }
 
+      let tarifDesimal = x.tarif / 100;
+      let penyusutan = x.harga_perolehan * tarifDesimal;
+      let totalPenyusutan = penyusutan * umurTahun;
+
+      if (umurTahun >= x.masa_manfaat) {
+        totalPenyusutan = penyusutan * x.masa_manfaat;
+      }
+
       return {
         ...x,
         umur: umurString,
         harga: useRupiah(x.harga_perolehan),
+        penyusutan: useRupiah(penyusutan),
+        totalPenyusutan: useRupiah(totalPenyusutan),
       };
     });
 
@@ -97,6 +108,17 @@ export class AssetService {
       return {
         ...x,
         harga: useRupiah(x.harga),
+      };
+    });
+  }
+
+  public async penyusutan() {
+    const data = await this.assetRepository.penyusutan();
+    return data.map((x) => {
+      return {
+        ...x,
+        total_harga_perolehan: useRupiah(x.total_harga_perolehan),
+        total_penyusutan: useRupiah(x.total_penyusutan),
       };
     });
   }
