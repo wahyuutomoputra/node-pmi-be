@@ -108,3 +108,14 @@ export class getLoanCalendarReq {
 
   status!: string | string[];
 }
+
+interface pengembalian{
+  id: number
+  status: string
+}
+export class pengembalianReq {
+  @IsDefined()
+  @IsNotEmpty()
+  listAsset!: pengembalian[];
+
+}

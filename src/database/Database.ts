@@ -1,28 +1,5 @@
-// // src/database/Database.ts
-
-// import knex, { Knex } from "knex";
-
-// export class Database {
-//   private knex: Knex;
-
-//   constructor() {
-//     this.knex = knex({
-//       client: "mysql2",
-//       connection: {
-//         host: "localhost",
-//         user: "username",
-//         password: "password",
-//         database: "database_name",
-//       },
-//     });
-//   }
-
-//   public getKnexInstance() {
-//     return this.knex;
-//   }
-// }
-
-// src/database/Database.ts
+import dotenv from "dotenv";
+dotenv.config();
 
 import { Knex, knex } from "knex";
 
@@ -33,12 +10,12 @@ class Database {
   private constructor() {
     // Inisialisasi dan konfigurasi instance Knex
     this.knexInstance = knex({
-      client: "mysql2",
+      client: process.env.DB_CLIENT,
       connection: {
-        host: "localhost",
-        user: "root",
-        password: "root",
-        database: "skripsi",
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
       },
       //debug: true
     });
