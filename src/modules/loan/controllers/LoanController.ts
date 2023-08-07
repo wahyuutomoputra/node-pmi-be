@@ -15,6 +15,7 @@ import {
   getLoanAllReq,
   getLoanCalendarReq,
   getLoanReq,
+  pengembalianReq,
 } from "../request";
 
 export class LoanController {
@@ -228,6 +229,26 @@ export class LoanController {
       responseError({ res, message: err });
       return;
     }
+  };
+
+  public pengembalian_with_status = async (req: Request, res: Response) => {
+    const input = plainToClass(pengembalianReq, req.body);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+    try {
+      await this.loanService.pengembalian_with_status(
+        input.id_peminjaman,
+        input.list_asset
+      );
+    } catch (err) {
+      responseError({ res, message: err });
+      return;
+    }
+
+    responseOk({ res });
   };
 
   // Metode lainnya untuk menangani permintaan HTTP terkait pengguna

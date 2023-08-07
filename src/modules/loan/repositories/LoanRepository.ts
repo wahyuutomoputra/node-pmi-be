@@ -6,6 +6,7 @@ import {
   ISelectAsset,
   ISelectLoan,
   ISelectLoanByDivisi,
+  Ipengembalian,
   addLoan,
   createLoan,
 } from "../types";
@@ -398,6 +399,59 @@ export class LoanRepository {
           });
         }
       });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async pengembalian_with_status(
+    id_peminjaman: number,
+    listAsset: Ipengembalian[]
+  ) {
+    try {
+      return await this.knex.transaction(async (trx) => {
+        // update loans
+        await trx("loans")
+          .where("id_peminjaman", id_peminjaman)
+          .update({
+            status: "dikembalikan",
+            tgl_pengembalian: format(new Date(), "yyyy-MM-dd"),
+          });
+
+        for (const asset of listAsset) {
+          let status = "tersedia";
+          if (asset.status != "baik") {
+            status = asset.status;
+            await trx("loan_details")
+              .where("id_detail_peminjaman", asset.id_detail_peminjaman)
+              .update({
+                status: status,
+              });
+          }
+
+          await trx("assets").where("id_asset", asset.id_asset).update({
+            status: status,
+          });
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async count_history(
+    id_peminjam: number,
+    status: string
+  ): Promise<number> {
+    try {
+      const result = await this.knex("loans as l")
+        .count("ld.id_detail_peminjaman as total")
+        .join("loan_details as ld", "l.id_peminjaman", "=", "ld.id_peminjaman")
+        .where("l.id_peminjam", id_peminjam)
+        .andWhere("ld.status", status);
+
+      const count = result[0].total as number;
+      return count ?? 0;
     } catch (error) {
       throw error;
     }

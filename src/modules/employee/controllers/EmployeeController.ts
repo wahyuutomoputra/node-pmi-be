@@ -32,7 +32,7 @@ export class EmployeeController {
         id_divisi: input.id_divisi
       });
     } catch (error) {
-      responseError({ res });
+      responseError({ res, message: error });
       return;
     }
     

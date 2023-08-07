@@ -9,6 +9,15 @@ export class EmployeeService {
   }
 
   public async create(data: addEmployee) {
+    const isAvailableEmail = await this.employeeRepository.isAvailableEmail(
+      data.email
+    );
+
+    console.log(isAvailableEmail)
+
+    if (!isAvailableEmail) {
+      throw new Error("Email sudah digunakan");
+    }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);
     data.password = hashedPassword;

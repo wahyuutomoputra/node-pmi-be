@@ -26,5 +26,14 @@ export class EmployeeRepository {
       .first();
   }
 
+  public async isAvailableEmail(email: string): Promise<boolean> {
+    const result = await this.knex("employees as e")
+      .select("id_pegawai")
+      .where("email", "=", email)
+      .first();
+
+    return !result;
+  }
+
   // Metode lainnya untuk berinteraksi dengan entitas pengguna dalam database
 }

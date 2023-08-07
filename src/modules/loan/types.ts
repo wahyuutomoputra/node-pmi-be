@@ -21,6 +21,7 @@ export interface IDetailLoan {
   id_asset: number;
   is_approved: number;
   tgl_approve: Date;
+  status: string;
 }
 
 export interface addLoan {
@@ -57,4 +58,10 @@ export interface ISelectLoan {
 }
 export interface ISelectLoanByDivisi extends ISelectLoan {
   id_divisi: number;
+}
+
+export interface Ipengembalian {
+  id_detail_peminjaman: number;
+  status: string;
+  id_asset: number
 }

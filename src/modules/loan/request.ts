@@ -7,6 +7,7 @@ import {
   IsIn,
   IsDate,
 } from "class-validator";
+import { Ipengembalian } from "./types";
 
 export class addLoanReq {
   @IsDefined()
@@ -109,13 +110,13 @@ export class getLoanCalendarReq {
   status!: string | string[];
 }
 
-interface pengembalian{
-  id: number
-  status: string
-}
+
 export class pengembalianReq {
   @IsDefined()
   @IsNotEmpty()
-  listAsset!: pengembalian[];
+  list_asset!: Ipengembalian[];
 
+  @IsDefined()
+  @IsNotEmpty()
+  id_peminjaman!: number;
 }

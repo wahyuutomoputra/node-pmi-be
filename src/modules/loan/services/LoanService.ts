@@ -1,6 +1,6 @@
 import { LoanRepository } from "../repositories/LoanRepository";
 import { LoanDetailRepository } from "../../loan_detail/repositories/LoanDetailRepository";
-import { ILoan, addLoan, createLoan } from "../types";
+import { ILoan, Ipengembalian, addLoan, createLoan } from "../types";
 import { AssetRepository } from "@modules/asset/repositories/AssetRepository";
 
 export class LoanService {
@@ -125,6 +125,17 @@ export class LoanService {
     });
 
     return data;
+  }
+
+  public async pengembalian_with_status(
+    id_peminjaman: number,
+    listAsset: Ipengembalian[]
+  ) {
+    const loan = await this.loanRepository.pengembalian_with_status(
+      id_peminjaman,
+      listAsset
+    );
+    return loan;
   }
 
   // Metode lainnya untuk logika bisnis terkait pengguna
