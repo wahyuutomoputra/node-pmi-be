@@ -13,7 +13,7 @@ export class EmployeeService {
       data.email
     );
 
-    console.log(isAvailableEmail)
+    console.log(isAvailableEmail);
 
     if (!isAvailableEmail) {
       throw new Error("Email sudah digunakan");
@@ -27,6 +27,23 @@ export class EmployeeService {
 
   public async get(): Promise<IEmployee[]> {
     return await this.employeeRepository.get();
+  }
+
+  public async getPaginatedEmployee(param: {
+    pageNumber: number;
+    searchTerm: string;
+    status?: string;
+  }) {
+    param.status = param.status ?? "";
+
+    let data = await this.employeeRepository.getPaginatedEmployee({
+      pageNumber: param.pageNumber,
+      pageSize: 10,
+      searchTerm: param.searchTerm,
+      status: param.status,
+    });
+
+    return data;
   }
 
   // Metode lainnya untuk logika bisnis terkait pengguna

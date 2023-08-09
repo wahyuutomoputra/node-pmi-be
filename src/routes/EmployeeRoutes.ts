@@ -12,7 +12,7 @@ export default function RoleRoutes(knexInstance: Knex) {
   const employeeController = new EmployeeController(employeeService);
 
   router.post("/", employeeController.createEmployee);
-  router.get("/", employeeController.getEmployee);
+  router.get("/", employeeController.getPaginatedEmployee);
   // tambahkan rute-rute lain yang terkait dengan entitas pengguna
 
   return router;

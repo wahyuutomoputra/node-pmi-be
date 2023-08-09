@@ -27,4 +27,13 @@ import {
     @IsNumber()
     id_divisi!: number;
   }
+
+  export class paginateEmployeeReq {
+    @IsDefined()
+    @IsNotEmpty()
+    page!: number;
+  
+    search!: string;
+    status!: string;
+  }
   
