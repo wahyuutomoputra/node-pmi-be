@@ -10,7 +10,7 @@ class Database {
   private constructor() {
     // Inisialisasi dan konfigurasi instance Knex
     this.knexInstance = knex({
-      client: process.env.DB_CLIENT,
+      client: 'mysql2',
       connection: {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
