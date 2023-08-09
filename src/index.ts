@@ -19,6 +19,9 @@ import AuthRoutes from "./routes/AuthRoutes";
 import LoanRoutes from "./routes/LoanRoutes";
 import { verifyToken } from "./middleware/AuthMiddleware";
 import { IEmployee } from "./modules/employee/types";
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
 

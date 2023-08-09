@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import { Knex, knex } from "knex";
 
 class Database {
@@ -10,7 +7,7 @@ class Database {
   private constructor() {
     // Inisialisasi dan konfigurasi instance Knex
     this.knexInstance = knex({
-      client: 'mysql2',
+      client: process.env.DB_CLIENT,
       connection: {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
