@@ -51,3 +51,13 @@ export class paginateAssets {
   search!: string;
   status!: string;
 }
+
+export class updateAssetReq extends addAssetReq {
+  @IsDefined()
+  @IsNotEmpty()
+  id_asset!: number;
+
+  @IsDefined()
+  @IsNotEmpty()
+  status!: string;
+}

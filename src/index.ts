@@ -35,7 +35,7 @@ declare global {
 
 // Initialize database connection
 const database = Database.getInstance();
-const knexInstance = database.getKnexInstance();
+let knexInstance = database.getKnexInstance();
 
 // Middleware
 app.use(cors());
@@ -46,18 +46,22 @@ app.use(morgan("dev"));
 
 const v1Router = express.Router();
 
-// Routes
-app.use("/api/users", UserRoutes(knexInstance));
-app.use("/api/roles", RoleRoutes(knexInstance));
-app.use("/api/groups", GroupRoutes(knexInstance));
-app.use("/api/divisions", DivisionRoutes(knexInstance));
-app.use("/api/types", TypeRoutes(knexInstance));
-app.use("/api/instances", InstanceRoutes(knexInstance));
-app.use("/api/employees", EmployeeRoutes(knexInstance));
-app.use("/api/borrowers", BorrowerRoutes(knexInstance));
-app.use("/api/assets", AssetRoutes(knexInstance));
-app.use("/api/auth", AuthRoutes(knexInstance));
-app.use("/api/loans", LoanRoutes(knexInstance));
+// Routes with "v1" prefix
+v1Router.use("/users", UserRoutes(knexInstance));
+v1Router.use("/roles", RoleRoutes(knexInstance));
+v1Router.use("/groups", GroupRoutes(knexInstance));
+v1Router.use("/divisions", DivisionRoutes(knexInstance));
+v1Router.use("/types", TypeRoutes(knexInstance));
+v1Router.use("/instances", InstanceRoutes(knexInstance));
+v1Router.use("/employees", EmployeeRoutes(knexInstance));
+v1Router.use("/borrowers", BorrowerRoutes(knexInstance));
+v1Router.use("/assets", AssetRoutes(knexInstance));
+v1Router.use("/loans", LoanRoutes(knexInstance));
+
+app.use("/api/v1/auth", AuthRoutes(knexInstance));
+
+// Mount the v1Router under "/api" prefix
+app.use("/api/v1", v1Router);
 
 // Start the server
 app.listen(3000, () => {

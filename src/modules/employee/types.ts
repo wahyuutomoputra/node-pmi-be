@@ -13,4 +13,8 @@ export interface IEmployee {
     password: string;
     id_divisi?: number;
   }
+
+  export interface updateEmployee extends Omit<addEmployee, "password"> {
+    password?: string;
+  }
   

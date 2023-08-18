@@ -7,7 +7,11 @@ import {
 } from "../../../helper/Response";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
-import { addEmployeeReq, paginateEmployeeReq } from "../request";
+import {
+  addEmployeeReq,
+  editEmployeeReq,
+  paginateEmployeeReq,
+} from "../request";
 
 export class EmployeeController {
   private employeeService: EmployeeService;
@@ -69,5 +73,41 @@ export class EmployeeController {
     }
   };
 
-  // Metode lainnya untuk menangani permintaan HTTP terkait pengguna
+  public updateEmployee = async (req: Request, res: Response) => {
+    const input = plainToClass(editEmployeeReq, req.body);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+
+    try {
+      await this.employeeService.update(
+        {
+          nama: input.nama,
+          email: input.email,
+          password: input.password,
+          id_divisi: input.id_divisi,
+        },
+        input.id_pegawai
+      );
+    } catch (error) {
+      responseError({ res, message: error });
+      return;
+    }
+
+    responseOk({ res });
+  };
+
+  public getDetailEmployee = async (req: Request, res: Response) => {
+    const id = (req.params.id as unknown as number) ?? 0;
+
+    try {
+      let data = await this.employeeService.getDetail(id);
+      responseOk({ res, data });
+    } catch (error) {
+      console.log(error)
+      responseError({ res });
+    }
+  };
 }

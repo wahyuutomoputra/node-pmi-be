@@ -7,7 +7,7 @@ import {
 } from "../../../helper/Response";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
-import { addAssetReq, paginateAssets } from "../request";
+import { addAssetReq, paginateAssets, updateAssetReq } from "../request";
 
 export class AssetController {
   private assetService: AssetService;
@@ -108,5 +108,35 @@ export class AssetController {
     }
   };
 
-  // Metode lainnya untuk menangani permintaan HTTP terkait pengguna
+  public updateAsset = async (req: Request, res: Response) => {
+    const input = plainToClass(updateAssetReq, req.body);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+
+    try {
+      await this.assetService.update(
+        {
+          harga_perolehan: input.harga_perolehan,
+          id_divisi: input.id_divisi,
+          id_jenis: input.id_jenis,
+          masa_manfaat: input.masa_manfaat,
+          nama_asset: input.name,
+          status: input.status,
+          tarif: input.tarif,
+          tgl_masuk: input.tgl_masuk,
+          asset_code: input.asset_code,
+        },
+        input.id_asset
+      );
+    } catch (error) {
+      console.log(error);
+      responseError({ res });
+      return;
+    }
+
+    responseOk({ res });
+  };
 }

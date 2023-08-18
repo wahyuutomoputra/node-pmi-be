@@ -1,5 +1,5 @@
 import { EmployeeRepository } from "../repositories/EmployeeRepository";
-import { IEmployee, addEmployee } from "../types";
+import { IEmployee, addEmployee, updateEmployee } from "../types";
 import bcrypt from "bcrypt";
 export class EmployeeService {
   private employeeRepository: EmployeeRepository;
@@ -46,5 +46,26 @@ export class EmployeeService {
     return data;
   }
 
-  // Metode lainnya untuk logika bisnis terkait pengguna
+  public async update(data: updateEmployee, id_pegawai: number) {
+    let update: updateEmployee = {
+      email: data.email,
+      nama: data.nama,
+      id_divisi: data.id_divisi,
+    };
+
+    if (data.password && data.password != "") {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(data.password, salt);
+      update.password = hashedPassword;
+    }
+
+    return await this.employeeRepository.update(update, id_pegawai);
+  }
+
+  public async getDetail(id: number) {
+    let data = await this.employeeRepository.getById(id);
+    if (data) delete data.password;
+
+    return data;
+  }
 }

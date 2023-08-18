@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { IEmployee, addEmployee } from "../types";
+import { IEmployee, addEmployee, updateEmployee } from "../types";
 
 export class EmployeeRepository {
   private knex: Knex;
@@ -99,6 +99,20 @@ export class EmployeeRepository {
     } catch (error) {
       throw error;
     }
+  }
+
+  public async update(data: updateEmployee, id_pegawai: number) {
+    return await this.knex(this.table)
+      .update(data)
+      .where("id_pegawai", id_pegawai);
+  }
+
+  public async getById(id: number): Promise<IEmployee> {
+    return await this.knex("employees as e")
+      .select("e.*", "d.nama_divisi")
+      .join("divisions as d", "e.id_divisi", "d.id_divisi")
+      .where("id_pegawai", "=", id)
+      .first();
   }
 
   // Metode lainnya untuk berinteraksi dengan entitas pengguna dalam database

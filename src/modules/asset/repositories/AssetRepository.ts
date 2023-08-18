@@ -17,6 +17,10 @@ export class AssetRepository {
     return insert;
   }
 
+  public async update(data: addAsset, id_asset: number) {
+    return await this.knex(this.table).update(data).where("id_asset", id_asset);
+  }
+
   public async get(): Promise<IAsset[]> {
     return await this.knex<IAsset>(this.table);
   }

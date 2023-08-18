@@ -14,8 +14,17 @@ class Database {
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
       },
-      //debug: true
     });
+
+    // Test database connection
+    this.knexInstance.raw("SELECT 1")
+      .then(() => {
+        console.log("Database connection established successfully.");
+      })
+      .catch((error) => {
+        console.error("Error connecting to the database:", error.message);
+        process.exit(1); // Terminate the application with an error code
+      });
   }
 
   public static getInstance(): Database {

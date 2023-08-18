@@ -123,5 +123,8 @@ export class AssetService {
     });
   }
 
-  // Metode lainnya untuk logika bisnis terkait pengguna
+  public async update(data: addAsset, id_asset: number) {
+    return await this.assetRepository.update(data, id_asset);
+  }
+
 }
