@@ -30,52 +30,21 @@ export class AssetService {
       status: param.status,
     });
 
-    const tanggalSekarang = new Date();
-
-    data.assets = data.assets.map((x) => {
-      const selisihMilisecond =
-        tanggalSekarang.getTime() - new Date(x.tgl_masuk).getTime();
-      const milisecondPerTahun = 1000 * 60 * 60 * 24 * 365.25; // Rata-rata tahun dalam milisecond
-      const milisecondPerBulan = milisecondPerTahun / 12; // Rata-rata bulan dalam milisecond
-
-      const umurTahun = Math.floor(selisihMilisecond / milisecondPerTahun);
-      const umurBulan = Math.floor(
-        (selisihMilisecond % milisecondPerTahun) / milisecondPerBulan
-      );
-      const umurHari = Math.floor(
-        (selisihMilisecond % milisecondPerBulan) / (1000 * 60 * 60 * 24)
-      );
-
-      let umurString = "";
-
-      if (umurTahun > 0) {
-        umurString += `${umurTahun} tahun, `;
-      }
-
-      if (umurBulan > 0) {
-        umurString += `${umurBulan} bulan, `;
-      }
-
-      if (umurHari > 0) {
-        umurString += `${umurHari} hari`;
-      }
-
-      let tarifDesimal = x.tarif / 100;
-      let penyusutan = x.harga_perolehan * tarifDesimal;
-      let totalPenyusutan = penyusutan * umurTahun;
-
-      if (umurTahun >= x.masa_manfaat) {
-        totalPenyusutan = penyusutan * x.masa_manfaat;
-      }
-
-      return {
-        ...x,
-        umur: umurString,
-        harga: useRupiah(x.harga_perolehan),
-        penyusutan: useRupiah(penyusutan),
-        totalPenyusutan: useRupiah(totalPenyusutan),
-      };
-    });
+    data.assets = await Promise.all(
+      data.assets.map(async (x) => {
+        const { umur, penyusutan, totalPenyusutan } = await this.getDetailAsset(
+          x
+        );
+        const updatedAsset = {
+          ...x,
+          umur: Number(umur),
+          harga: useRupiah(x.harga_perolehan),
+          penyusutan: useRupiah(Number(penyusutan)),
+          totalPenyusutan: useRupiah(Number(totalPenyusutan)),
+        };
+        return updatedAsset;
+      })
+    );
 
     return data;
   }
@@ -127,4 +96,63 @@ export class AssetService {
     return await this.assetRepository.update(data, id_asset);
   }
 
+  public async getById(id: number) {
+    const asset = await this.assetRepository.getById(id);
+    if (asset == undefined) throw Error("Asset Not Found");
+
+    const { penyusutan, totalPenyusutan, umur } = await this.getDetailAsset(
+      asset
+    );
+
+    return {
+      ...asset,
+      penyusutan,
+      totalPenyusutan,
+      umur,
+    };
+  }
+
+  public async getDetailAsset(x: IAsset) {
+    const tanggalSekarang = new Date();
+    const selisihMilisecond =
+      tanggalSekarang.getTime() - new Date(x.tgl_masuk).getTime();
+    const milisecondPerTahun = 1000 * 60 * 60 * 24 * 365.25; // Rata-rata tahun dalam milisecond
+    const milisecondPerBulan = milisecondPerTahun / 12; // Rata-rata bulan dalam milisecond
+
+    const umurTahun = Math.floor(selisihMilisecond / milisecondPerTahun);
+    const umurBulan = Math.floor(
+      (selisihMilisecond % milisecondPerTahun) / milisecondPerBulan
+    );
+    const umurHari = Math.floor(
+      (selisihMilisecond % milisecondPerBulan) / (1000 * 60 * 60 * 24)
+    );
+
+    let umurString = "";
+
+    if (umurTahun > 0) {
+      umurString += `${umurTahun} tahun, `;
+    }
+
+    if (umurBulan > 0) {
+      umurString += `${umurBulan} bulan, `;
+    }
+
+    if (umurHari > 0) {
+      umurString += `${umurHari} hari`;
+    }
+
+    let tarifDesimal = x.tarif / 100;
+    let penyusutan = x.harga_perolehan * tarifDesimal;
+    let totalPenyusutan = penyusutan * umurTahun;
+
+    if (umurTahun >= x.masa_manfaat) {
+      totalPenyusutan = penyusutan * x.masa_manfaat;
+    }
+
+    return {
+      umur: umurString,
+      penyusutan,
+      totalPenyusutan,
+    };
+  }
 }

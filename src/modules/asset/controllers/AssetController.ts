@@ -7,7 +7,12 @@ import {
 } from "../../../helper/Response";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
-import { addAssetReq, paginateAssets, updateAssetReq } from "../request";
+import {
+  addAssetReq,
+  getByIdReq,
+  paginateAssets,
+  updateAssetReq,
+} from "../request";
 
 export class AssetController {
   private assetService: AssetService;
@@ -138,5 +143,23 @@ export class AssetController {
     }
 
     responseOk({ res });
+  };
+
+  public getById = async (req: Request, res: Response) => {
+    const input = plainToClass(getByIdReq, req.query);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+
+    try {
+      const data = await this.assetService.getById(input.id_asset);
+      responseOk({ res, data });
+    } catch (error) {
+      console.log(error);
+      responseError({ res, message: error });
+      return;
+    }
   };
 }

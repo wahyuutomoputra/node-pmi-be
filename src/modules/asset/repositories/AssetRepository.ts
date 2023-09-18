@@ -3,6 +3,13 @@ import { IAsset, IHarga, IPaginateAsset, addAsset } from "../types";
 import { format } from "date-fns";
 
 export class AssetRepository {
+  // status asset
+  // rusak
+  // hilang
+  // booked
+  // dipinjam
+  // tersedia
+  
   private knex: Knex;
   private table: string;
 
@@ -168,6 +175,12 @@ export class AssetRepository {
     }[];
 
     return result;
+  }
+
+  public async getById(id: number) {
+    return await this.knex<IAsset>(this.table)
+      .where("id_asset", "=", id)
+      .first();
   }
 
   // Metode lainnya untuk berinteraksi dengan entitas pengguna dalam database

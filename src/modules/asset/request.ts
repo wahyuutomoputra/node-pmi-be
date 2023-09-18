@@ -61,3 +61,10 @@ export class updateAssetReq extends addAssetReq {
   @IsNotEmpty()
   status!: string;
 }
+
+export class getByIdReq {
+  @IsDefined()
+  @IsNotEmpty()
+  id_asset!: number;
+}
+

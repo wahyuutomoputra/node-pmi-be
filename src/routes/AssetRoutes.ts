@@ -12,12 +12,13 @@ export default function RoleRoutes(knexInstance: Knex) {
   const assetController = new AssetController(assetService);
 
   router.post("/", assetController.createAsset);
-  router.put("/", assetController.updateAsset);
+  router.post("/update", assetController.updateAsset);
   router.get("/", assetController.getAsset);
   router.get("/paginate", assetController.getPaginatedAssets)
   router.get("/dashboard", assetController.dashboard)
   router.get("/harga", assetController.harga_asset)
   router.get("/penyusutan", assetController.penyusutan)
+  router.get("/detail", assetController.getById)
 
   return router;
 }
