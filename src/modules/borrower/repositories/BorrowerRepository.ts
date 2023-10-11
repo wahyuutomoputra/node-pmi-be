@@ -1,5 +1,10 @@
 import { Knex } from "knex";
-import { IBorrower, IPaginateBorrower, addBorrower } from "../types";
+import {
+  IBorrower,
+  IPaginateBorrower,
+  addBorrower,
+  editBorrower,
+} from "../types";
 
 export class BorrowerRepository {
   private knex: Knex;
@@ -67,5 +72,19 @@ export class BorrowerRepository {
     } catch (error) {
       throw error;
     }
+  }
+
+  public async getById(id: number) {
+    return await this.knex<IBorrower>(`${this.table} as b`)
+      .select("b.*", "i.nama_instansi")
+      .join("instances as i", "b.id_instansi", "i.id_instansi")
+      .where("b.id_peminjam", "=", id)
+      .first();
+  }
+
+  public async update(data: editBorrower) {
+    return await this.knex(this.table)
+      .update(data)
+      .where("id_peminjam", "=", data.id_peminjam);
   }
 }

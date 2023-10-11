@@ -39,5 +39,9 @@ export class UserService {
     }
   }
 
+  public async getById(id: number){
+
+  }
+
   // Metode lainnya untuk logika bisnis terkait pengguna
 }

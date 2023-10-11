@@ -1,5 +1,5 @@
 import { BorrowerRepository } from "../repositories/BorrowerRepository";
-import { IBorrower, addBorrower } from "../types";
+import { IBorrower, addBorrower, editBorrower } from "../types";
 
 export class BorrowerService {
   private borrowerRepository: BorrowerRepository;
@@ -30,6 +30,14 @@ export class BorrowerService {
       pageSize: param.limit,
       searchTerm: param.searchTerm,
     });
+  }
+
+  public async getById(id: number) {
+    return await this.borrowerRepository.getById(id);
+  }
+
+  public async update(data: editBorrower) {
+    return await this.borrowerRepository.update(data);
   }
 
   // Metode lainnya untuk logika bisnis terkait pengguna

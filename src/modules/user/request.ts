@@ -10,3 +10,10 @@ export class addUserReq {
   password?: string;
   tgl_lahir!: string;
 }
+
+export class getByIdReq {
+  @IsDefined()
+  @IsNotEmpty()
+  id_user!: number;
+}
+

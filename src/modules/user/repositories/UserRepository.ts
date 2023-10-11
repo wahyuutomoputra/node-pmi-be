@@ -13,6 +13,7 @@ export class UserRepository {
     const [userId] = await this.knex("users").insert(userData);
     return userId;
   }
+  
 
   // Metode lainnya untuk berinteraksi dengan entitas pengguna dalam database
 }

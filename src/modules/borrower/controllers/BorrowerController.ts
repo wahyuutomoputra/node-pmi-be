@@ -7,7 +7,12 @@ import {
 } from "../../../helper/Response";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
-import { addBorrowerReq, paginateBorrowerReq } from "../request";
+import {
+  addBorrowerReq,
+  editBorrowerReq,
+  getByIdReq,
+  paginateBorrowerReq,
+} from "../request";
 
 export class BorrowerController {
   private borrowerService: BorrowerService;
@@ -30,7 +35,7 @@ export class BorrowerController {
         nama_peminjam: input.name,
         nik: input.nik,
         tgl_lahir: input.tgl_lahir,
-        no_telp: input.no_telp
+        no_telp: input.no_telp,
       });
     } catch (error) {
       responseError({ res, message: error });
@@ -65,6 +70,49 @@ export class BorrowerController {
       console.log(error);
       responseError({ res });
     }
+  };
+
+  public getById = async (req: Request, res: Response) => {
+    const input = plainToClass(getByIdReq, req.query);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+
+    try {
+      const data = await this.borrowerService.getById(input.id_user);
+      responseOk({ res, data });
+    } catch (error) {
+      console.log(error);
+      responseError({ res, message: error });
+      return;
+    }
+  };
+
+  public editBorrower = async (req: Request, res: Response) => {
+    const input = plainToClass(editBorrowerReq, req.body);
+    const error = await validate(input);
+    if (error.length > 0) {
+      responseErrorInput({ res, error });
+      return;
+    }
+
+    try {
+      await this.borrowerService.update({
+        id_instansi: input.id_instansi,
+        nama_peminjam: input.name,
+        nik: input.nik,
+        tgl_lahir: input.tgl_lahir,
+        no_telp: input.no_telp,
+        id_peminjam: input.id_peminjam,
+      });
+    } catch (error) {
+      responseError({ res, message: error });
+      return;
+    }
+
+    responseOk({ res });
   };
 
   // Metode lainnya untuk menangani permintaan HTTP terkait pengguna

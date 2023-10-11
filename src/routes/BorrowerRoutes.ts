@@ -14,6 +14,8 @@ export default function RoleRoutes(knexInstance: Knex) {
   router.post("/", borrowerController.createBorrower);
   router.get("/", borrowerController.getBorrower);
   router.get("/paginate", borrowerController.getPaginatedBorrower);
+  router.get("/detail", borrowerController.getById)
+  router.post("/update", borrowerController.editBorrower)
   // tambahkan rute-rute lain yang terkait dengan entitas pengguna
 
   return router;
